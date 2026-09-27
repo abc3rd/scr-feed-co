@@ -15,6 +15,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import Placeholder from '@/pages/Placeholder';
 import SitePerformance from '@/pages/SitePerformance';
+import Profile from '@/pages/Profile';
 import AppShell from '@/components/layout/AppShell';
 import CustomerGate from '@/components/layout/CustomerGate';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -64,6 +65,7 @@ const AuthenticatedApp = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/card" element={<Placeholder title="Card on file" />} />
             <Route path="/orders/:id" element={<Placeholder title="Order detail" />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>
         <Route path="*" element={<PageNotFound />} />

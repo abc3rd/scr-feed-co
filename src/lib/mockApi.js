@@ -157,5 +157,10 @@ export async function mockTransport(method, fullPath, body = {}, headers = {}) {
   }
   if (route === "GET /dashboard") return dashboard(query.get("location"));
   if (route === "POST /orders") return placeHold(body);
+  if (route === "DELETE /me") {
+    localStorage.removeItem(PROFILE_KEY);
+    session.access = null;
+    return ok({ deleted: true });
+  }
   return fail(404, "Not found.");
 }

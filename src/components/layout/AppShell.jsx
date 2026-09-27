@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import BottomNav from "@/components/layout/BottomNav";
 
 export default function AppShell() {
   return (
@@ -10,10 +11,11 @@ export default function AppShell() {
         Skip to content
       </a>
       <SiteHeader />
-      <main id="main" className="flex-1 w-full max-w-xl mx-auto px-4 pt-5 pb-10">
+      <main id="main" className="flex-1 w-full max-w-xl mx-auto px-4 pt-5 pb-28">
         <Outlet />
       </main>
       <SiteFooter />
+      <BottomNav />
     </div>
   );
 }

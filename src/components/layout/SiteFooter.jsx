@@ -11,7 +11,7 @@ const LINKS = [
 export default function SiteFooter() {
   return (
     <footer className="border-t border-border bg-secondary/60">
-      <div className="max-w-xl mx-auto px-4 py-8">
+      <div className="max-w-xl mx-auto px-4 pt-8 pb-28">
         <p className="font-heading text-2xl tracking-wide text-primary">SCR Feed Co.</p>
         <p className="text-sm text-muted-foreground">LaBelle · Fort Myers, Florida</p>
         <nav aria-label="Legal" className="mt-4">

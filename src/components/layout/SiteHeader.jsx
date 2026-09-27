@@ -8,7 +8,7 @@ export default function SiteHeader() {
   const signedIn = status === "ready" || status === "needsName";
 
   return (
-    <header className="bg-primary text-primary-foreground">
+    <header className="bg-primary text-primary-foreground safe-area-top">
       <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         <Link to="/" className="flex items-baseline gap-2 rounded min-w-0">
           <span className="font-heading text-3xl tracking-wider leading-none">SCR Feed Co.</span>

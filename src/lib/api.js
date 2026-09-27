@@ -83,4 +83,5 @@ export const api = {
   updateMe: (profile) => request("PATCH", "/me", { body: profile }),
   getDashboard: (location) => request("GET", `/dashboard?location=${encodeURIComponent(location)}`),
   placeHold: (order) => request("POST", "/orders", { body: order }),
+  deleteAccount: () => request("DELETE", "/me"),
 };

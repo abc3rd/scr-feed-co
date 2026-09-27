@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { RefreshCw, Search, TrendingUp, MousePointerClick, Eye, Target } from "lucide-react";
+import { RefreshCw, Search, TrendingUp, MousePointerClick, Eye, Target, ChevronDown } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { searchConsolePerformance } from "@/functions/searchConsolePerformance";
+import BackHeader from "@/components/layout/BackHeader";
+import OptionSheet from "@/components/site/OptionSheet";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -62,6 +63,8 @@ export default function SitePerformance() {
   const [days, setDays] = useState("28");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [siteSheet, setSiteSheet] = useState(false);
+  const [rangeSheet, setRangeSheet] = useState(false);
 
   const load = async (site, range) => {
     setLoading(true);
@@ -70,8 +73,10 @@ export default function SitePerformance() {
       const res = await searchConsolePerformance({ siteUrl: site, days: range });
       const d = res.data;
       setSites(d.sites || []);
-      if (d.message) { setData(null); setError(d.message); }
-      else {
+      if (d.message) {
+        setData(null);
+        setError(d.message);
+      } else {
         setData(d);
         setSiteUrl(d.siteUrl);
       }
@@ -82,52 +87,82 @@ export default function SitePerformance() {
     }
   };
 
-  useEffect(() => { load("", days); }, []);
+  useEffect(() => {
+    load("", days);
+  }, []);
 
-  const onSite = (e) => { setSiteUrl(e.target.value); load(e.target.value, days); };
-  const onRange = (e) => { setDays(e.target.value); load(siteUrl, e.target.value); };
+  const onSite = (v) => {
+    setSiteUrl(v);
+    load(v, days);
+  };
+  const onRange = (v) => {
+    setDays(v);
+    load(siteUrl, v);
+  };
+
+  const siteLabel = sites.find((s) => s.siteUrl === siteUrl)?.siteUrl || "Select site";
+  const rangeLabel = RANGES.find(([v]) => v === days)?.[1] || "Select range";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-primary text-primary-foreground">
-        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="font-heading text-3xl tracking-wider">SCR Feed Co.</Link>
-          <span className="text-xs uppercase tracking-[0.2em] opacity-75">Site performance</span>
-        </div>
-      </header>
-
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 space-y-6">
-        <div className="flex flex-wrap items-end gap-3 justify-between">
-          <div>
-            <h1 className="font-heading text-5xl leading-none">Search performance</h1>
-            <p className="text-muted-foreground text-sm mt-1">Synced from Google Search Console.</p>
-          </div>
-          <button type="button" onClick={() => load(siteUrl, days)} className="h-11 px-4 rounded-xl border border-border bg-card font-semibold flex items-center gap-2">
+    <div>
+      <BackHeader title="Search performance" />
+      <main className="w-full max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-end justify-between gap-3">
+          <p className="text-muted-foreground text-sm">Synced from Google Search Console.</p>
+          <button
+            type="button"
+            onClick={() => load(siteUrl, days)}
+            className="h-11 px-4 rounded-xl border border-border bg-card font-semibold flex items-center gap-2 select-none"
+          >
             <RefreshCw className="h-4 w-4" aria-hidden="true" /> Refresh
           </button>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <label className="flex-1 min-w-[180px]">
-            <span className="block text-sm font-semibold mb-1">Site</span>
-            <select value={siteUrl} onChange={onSite} disabled={!sites.length} className="w-full h-12 rounded-xl border-2 border-input bg-card px-3 font-medium focus:border-primary">
-              {sites.map((s) => <option key={s.siteUrl} value={s.siteUrl}>{s.siteUrl}</option>)}
-            </select>
-          </label>
-          <label>
-            <span className="block text-sm font-semibold mb-1">Date range</span>
-            <select value={days} onChange={onRange} className="h-12 rounded-xl border-2 border-input bg-card px-3 font-medium focus:border-primary">
-              {RANGES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
-          </label>
+          <button
+            type="button"
+            onClick={() => setSiteSheet(true)}
+            disabled={!sites.length}
+            className="flex-1 min-w-[180px] h-12 rounded-xl border-2 border-input bg-card px-3 flex items-center justify-between gap-2 font-medium focus:border-primary disabled:opacity-50 select-none"
+          >
+            <span className="truncate">{siteLabel}</span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setRangeSheet(true)}
+            className="h-12 rounded-xl border-2 border-input bg-card px-3 flex items-center justify-between gap-2 font-medium focus:border-primary select-none"
+          >
+            <span>{rangeLabel}</span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+          </button>
         </div>
+
+        <OptionSheet
+          open={siteSheet}
+          onOpenChange={setSiteSheet}
+          title="Select site"
+          value={siteUrl}
+          onSelect={onSite}
+          options={sites.map((s) => ({ value: s.siteUrl, label: s.siteUrl }))}
+        />
+        <OptionSheet
+          open={rangeSheet}
+          onOpenChange={setRangeSheet}
+          title="Date range"
+          value={days}
+          onSelect={onRange}
+          options={RANGES.map(([v, l]) => ({ value: v, label: l }))}
+        />
 
         {error && <p role="alert" className="text-destructive font-medium">{error}</p>}
 
         {loading ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-24 rounded-2xl bg-secondary" />)}
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-24 rounded-2xl bg-secondary" />
+              ))}
             </div>
             <Skeleton className="h-64 rounded-2xl bg-secondary" />
           </div>
@@ -162,9 +197,17 @@ export default function SitePerformance() {
             </section>
 
             {data.topQueries.length > 0 && (
-              <Table title="Top queries" rows={data.topQueries} keyLabel="Query" renderKey={(r) => (
-                <span className="flex items-center gap-2"><Search className="h-3 w-3 text-muted-foreground shrink-0" aria-hidden="true" />{r.query}</span>
-              )} />
+              <Table
+                title="Top queries"
+                rows={data.topQueries}
+                keyLabel="Query"
+                renderKey={(r) => (
+                  <span className="flex items-center gap-2">
+                    <Search className="h-3 w-3 text-muted-foreground shrink-0" aria-hidden="true" />
+                    {r.query}
+                  </span>
+                )}
+              />
             )}
             {data.topPages.length > 0 && (
               <Table title="Top pages" rows={data.topPages} keyLabel="Page" renderKey={(r) => <span className="truncate">{r.page}</span>} />
