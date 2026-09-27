@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 export default function OptionSheet({ open, onOpenChange, title, options, value, onSelect }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl safe-area-bottom">
+      <SheetContent side="bottom" className="rounded-t-3xl" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
         <SheetHeader className="text-left">
           <SheetTitle className="font-heading text-2xl tracking-wide">{title}</SheetTitle>
         </SheetHeader>

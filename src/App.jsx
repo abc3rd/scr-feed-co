@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -14,7 +14,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import Placeholder from '@/pages/Placeholder';
-import SitePerformance from '@/pages/SitePerformance';
+const SitePerformance = lazy(() => import("@/pages/SitePerformance"));
 import Profile from '@/pages/Profile';
 import AppShell from '@/components/layout/AppShell';
 import CustomerGate from '@/components/layout/CustomerGate';
@@ -59,7 +59,7 @@ const AuthenticatedApp = () => {
           <Route path="/review" element={<Placeholder title="Review your order" />} />
           <Route path="/yard" element={<Placeholder title="Yard" note="Staff tools are coming in a later build." />} />
           <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-            <Route path="/seo" element={<SitePerformance />} />
+            <Route path="/seo" element={<Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" /></div>}><SitePerformance /></Suspense>} />
           </Route>
           <Route element={<CustomerGate />}>
             <Route path="/" element={<Dashboard />} />

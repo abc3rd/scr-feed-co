@@ -16,6 +16,7 @@ import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import CartBar from "@/components/cart/CartBar";
 import CartDrawer from "@/components/cart/CartDrawer";
 import HoldPlacedDialog from "@/components/cart/HoldPlacedDialog";
+import PullToRefresh from "@/components/dashboard/PullToRefresh";
 
 export default function Dashboard() {
   const { customer } = useSession();
@@ -44,7 +45,12 @@ export default function Dashboard() {
     queryClient.invalidateQueries({ queryKey: ["dashboard"] });
   };
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+  };
+
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div>
       <div className="flex items-end justify-between gap-3 mb-4">
         <div className="min-w-0">
@@ -84,5 +90,6 @@ export default function Dashboard() {
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} items={liveItems} cart={cart} location={location} onPlaced={onPlaced} />
       <HoldPlacedDialog order={placed} onClose={() => setPlaced(null)} />
     </div>
+    </PullToRefresh>
   );
 }

@@ -38,7 +38,7 @@ export default function CartDrawer({ open, onOpenChange, items, cart, location, 
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto rounded-t-3xl bg-background px-4 pb-6">
+      <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto rounded-t-3xl bg-background px-4" style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}>
         <div className="max-w-xl mx-auto">
           <SheetHeader className="text-left">
             <SheetTitle className="font-heading text-4xl tracking-wide font-normal">Your cart</SheetTitle>

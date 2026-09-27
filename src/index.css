@@ -103,4 +103,9 @@
     outline: 3px solid hsl(var(--ring));
     outline-offset: 2px;
   }
+
+  button, [role="tab"], header, nav {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
