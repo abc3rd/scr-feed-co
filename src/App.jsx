@@ -11,8 +11,9 @@ import ScrollToTop from './components/ScrollToTop';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
+import Orders from '@/pages/Orders';
+import DeleteAccount from '@/pages/DeleteAccount';
 import Placeholder from '@/pages/Placeholder';
 const SitePerformance = lazy(() => import("@/pages/SitePerformance"));
 import Profile from '@/pages/Profile';
@@ -54,7 +55,7 @@ const AuthenticatedApp = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/delete-account" element={<DeleteAccount />} />
         <Route element={<AppShell />}>
           <Route path="/review" element={<Placeholder title="Review your order" />} />
           <Route path="/yard" element={<Placeholder title="Yard" note="Staff tools are coming in a later build." />} />
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
           </Route>
           <Route element={<CustomerGate />}>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/orders" element={<Orders />} />
             <Route path="/card" element={<Placeholder title="Card on file" />} />
             <Route path="/orders/:id" element={<Placeholder title="Order detail" />} />
             <Route path="/profile" element={<Profile />} />

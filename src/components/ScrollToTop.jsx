@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
 
-const TABS = ["/", "/seo", "/profile"];
+const TABS = ["/", "/orders", "/profile", "/seo"];
 
 const getHashId = (hash) => {
   const rawId = hash.slice(1);
