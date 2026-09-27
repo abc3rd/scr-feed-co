@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -14,8 +14,10 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import Placeholder from '@/pages/Placeholder';
+import SitePerformance from '@/pages/SitePerformance';
 import AppShell from '@/components/layout/AppShell';
 import CustomerGate from '@/components/layout/CustomerGate';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { SessionProvider } from '@/lib/SessionContext';
 import { captureDeepLink } from '@/lib/deepLink';
 
@@ -55,6 +57,9 @@ const AuthenticatedApp = () => {
         <Route element={<AppShell />}>
           <Route path="/review" element={<Placeholder title="Review your order" />} />
           <Route path="/yard" element={<Placeholder title="Yard" note="Staff tools are coming in a later build." />} />
+          <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+            <Route path="/seo" element={<SitePerformance />} />
+          </Route>
           <Route element={<CustomerGate />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/card" element={<Placeholder title="Card on file" />} />
