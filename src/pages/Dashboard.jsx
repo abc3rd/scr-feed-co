@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CreditCard } from "lucide-react";
 import { api, STORES } from "@/lib/api";
@@ -17,6 +17,20 @@ import CartBar from "@/components/cart/CartBar";
 import CartDrawer from "@/components/cart/CartDrawer";
 import HoldPlacedDialog from "@/components/cart/HoldPlacedDialog";
 import PullToRefresh from "@/components/dashboard/PullToRefresh";
+
+const linesForReorder = (order, index) =>
+  (order.lines || [])
+    .map((l) => {
+      const p = index[l.sku];
+      return {
+        sku: l.sku,
+        name: p?.name || l.name,
+        size: p?.size || "",
+        price: p?.price ?? 0,
+        qty: Math.min(l.qty, p?.available ?? l.qty),
+      };
+    })
+    .filter((l) => l.qty > 0);
 
 export default function Dashboard() {
   const { customer } = useSession();
@@ -48,6 +62,33 @@ export default function Dashboard() {
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
   };
+
+  const pendingReorderRef = useRef(null);
+
+  const reorder = (order) => {
+    if (order.location !== location) {
+      pendingReorderRef.current = order;
+      setLocation(order.location);
+      return;
+    }
+    const lines = linesForReorder(order, productIndex);
+    if (lines.length) {
+      cart.setAll(lines);
+      setCartOpen(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!pendingReorderRef.current || isLoading || !data) return;
+    const order = pendingReorderRef.current;
+    if (order.location !== location || data.location !== location) return;
+    pendingReorderRef.current = null;
+    const lines = linesForReorder(order, indexProducts(data));
+    if (lines.length) {
+      cart.setAll(lines);
+      setCartOpen(true);
+    }
+  }, [data, isLoading, location]);
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
@@ -81,7 +122,7 @@ export default function Dashboard() {
             <ProductSection title="Favorites" products={data.favorites} cartQty={cartQty} onAdd={cart.add} emptyText="No favorites yet." />
             <CategoryBrowser key={location} categories={data.categories} cartQty={cartQty} onAdd={cart.add} />
             <TrucksSection trucks={data.trucks} location={location} />
-            <OrdersSection title="Past orders" orders={data.pastOrders} emptyText="No past orders yet." />
+            <OrdersSection title="Past orders" orders={data.pastOrders} emptyText="No past orders yet." onReorder={reorder} />
           </div>
         )}
       </div>

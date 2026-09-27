@@ -22,7 +22,8 @@ export default function useCart(location) {
   const setQty = (sku, qty) => update((list) => list.map((i) => (i.sku === sku ? { ...i, qty } : i)));
   const remove = (sku) => update((list) => list.filter((i) => i.sku !== sku));
   const clear = () => update(() => []);
+  const setAll = (items) => update(() => items);
   const count = items.reduce((n, i) => n + i.qty, 0);
 
-  return { items, add, setQty, remove, clear, count };
+  return { items, add, setQty, remove, clear, setAll, count };
 }
