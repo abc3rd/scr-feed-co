@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
 import { LayoutDashboard, BarChart3, User } from "lucide-react";
 
 const TABS = [
@@ -21,13 +22,24 @@ export default function BottomNav() {
             to={to}
             end={end}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-semibold uppercase tracking-wide transition-colors ${
+              `relative flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-semibold uppercase tracking-wide transition-colors ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`
             }
           >
-            <Icon className="h-5 w-5" aria-hidden="true" />
-            {label}
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <motion.span
+                    layoutId="bottomNavActive"
+                    className="absolute inset-x-3 inset-y-1.5 rounded-xl bg-accent"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <Icon className="h-5 w-5 relative z-10" aria-hidden="true" />
+                <span className="relative z-10">{label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </div>

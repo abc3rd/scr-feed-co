@@ -1,5 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
+
+const TABS = ["/", "/seo", "/profile"];
 
 const getHashId = (hash) => {
   const rawId = hash.slice(1);
@@ -14,6 +16,8 @@ const getHashId = (hash) => {
 export default function ScrollToTop() {
   const { pathname, hash } = useLocation();
   const navigationType = useNavigationType();
+  const scrollMap = useRef({});
+  const prevPath = useRef(pathname);
 
   useEffect(() => {
     if (navigationType === "POP") return;
@@ -26,7 +30,16 @@ export default function ScrollToTop() {
       return () => window.clearTimeout(timer);
     }
 
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    if (prevPath.current !== pathname) {
+      scrollMap.current[prevPath.current] = window.scrollY;
+    }
+
+    if (TABS.includes(pathname) && scrollMap.current[pathname] != null) {
+      window.scrollTo({ top: scrollMap.current[pathname], left: 0, behavior: "instant" });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+    prevPath.current = pathname;
   }, [pathname, hash, navigationType]);
 
   return null;
