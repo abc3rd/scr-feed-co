@@ -77,6 +77,8 @@ function issueTokens() {
   return { accessToken: session.access, refreshToken: `mock-refresh-${Date.now()}` };
 }
 
+export function setMockSession(token) { session.access = token; }
+
 function handleAuth(path, body) {
   if (path === "/auth/send-code") {
     let digits = String(body.phone || "").replace(/\D/g, "");

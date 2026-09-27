@@ -1,9 +1,19 @@
-import { mockTransport } from "@/lib/mockApi";
+import { mockTransport, setMockSession } from "@/lib/mockApi";
 
 // Single place for every server call.
 export const API_BASE = "https://scr-feed-app.vercel.app/api/v1";
 export const USE_MOCK = true;
 export const STORES = ["LaBelle", "Fort Myers"];
+
+const DEMO_CUSTOMER = {
+  id: "cus_demo_scr",
+  phone: "2395550142",
+  firstName: "SCR",
+  lastName: "Demo",
+  email: "demo@scrfeedco.com",
+  preferredStore: "LaBelle",
+  card: { brand: "Visa", last4: "4242" },
+};
 
 const REFRESH_KEY = "scr_refresh_token";
 let accessToken = null; // memory only
@@ -74,6 +84,17 @@ async function request(method, path, { body, auth = true } = {}) {
 
 export const api = {
   sendCode: (phone) => request("POST", "/auth/send-code", { body: { phone }, auth: false }),
+  demoSignIn: () => {
+    const data = {
+      accessToken: `demo-access-${Date.now()}`,
+      refreshToken: null,
+      needsName: false,
+      customer: DEMO_CUSTOMER,
+    };
+    accessToken = data.accessToken;
+    if (USE_MOCK) setMockSession(data.accessToken);
+    return data;
+  },
   verifyCode: async (phone, code) => {
     const data = await request("POST", "/auth/verify", { body: { phone, code }, auth: false });
     saveTokens(data);
