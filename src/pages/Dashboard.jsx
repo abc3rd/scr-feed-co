@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreditCard } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CreditCard, Sparkles } from "lucide-react";
 import { api, STORES } from "@/lib/api";
 import { indexProducts } from "@/lib/format";
-import { readPendingAdd } from "@/lib/deepLink";
+import { readPendingAdd, readPendingReorder, clearPendingReorder } from "@/lib/deepLink";
 import { useSession } from "@/lib/SessionContext";
 import useCart from "@/hooks/useCart";
 import usePendingAdd from "@/hooks/usePendingAdd";
@@ -36,7 +37,8 @@ export default function Dashboard() {
   const { customer } = useSession();
   const queryClient = useQueryClient();
   const [location, setLocation] = useState(() => {
-    const loc = readPendingAdd()?.loc;
+    const pending = readPendingReorder();
+    const loc = pending?.location || readPendingAdd()?.loc;
     return STORES.includes(loc) ? loc : customer.preferredStore || STORES[0];
   });
   const [cartOpen, setCartOpen] = useState(false);
@@ -62,6 +64,22 @@ export default function Dashboard() {
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
   };
+
+  // Applies a reorder started from a member barn QR, once this store's data is loaded.
+  const qrReorderAppliedRef = useRef(false);
+  useEffect(() => {
+    if (qrReorderAppliedRef.current || isLoading || !data) return;
+    const pending = readPendingReorder();
+    if (!pending) return;
+    qrReorderAppliedRef.current = true;
+    clearPendingReorder();
+    if (data.location !== location) return;
+    const lines = (pending.lines || []).filter((l) => l.qty > 0);
+    if (lines.length) {
+      cart.setAll(lines);
+      setCartOpen(true);
+    }
+  }, [data, isLoading, location]);
 
   const pendingReorderRef = useRef(null);
 
@@ -106,6 +124,14 @@ export default function Dashboard() {
         )}
       </div>
       <StoreSwitcher value={location} onChange={setLocation} />
+
+      <Link
+        to="/assistant"
+        className="mt-4 inline-flex items-center gap-2 h-11 px-4 rounded-2xl bg-accent text-accent-foreground font-bold select-none active:opacity-80"
+      >
+        <Sparkles className="h-4 w-4" aria-hidden="true" />
+        Ask the SCR assistant
+      </Link>
 
       <div className="mt-6">
         {isLoading ? (

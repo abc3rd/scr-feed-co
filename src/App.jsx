@@ -13,6 +13,10 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Dashboard from '@/pages/Dashboard';
 import Orders from '@/pages/Orders';
+import Join from '@/pages/Join';
+import MemberLanding from '@/pages/MemberLanding';
+import QrCodes from '@/pages/QrCodes';
+import AssistantPage from '@/pages/AssistantPage';
 import DeleteAccount from '@/pages/DeleteAccount';
 import Placeholder from '@/pages/Placeholder';
 const SitePerformance = lazy(() => import("@/pages/SitePerformance"));
@@ -56,6 +60,9 @@ const AuthenticatedApp = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/delete-account" element={<DeleteAccount />} />
+        <Route path="/join" element={<Join />} />
+        <Route path="/m/:token" element={<MemberLanding />} />
+        <Route path="/qr" element={<QrCodes />} />
         <Route element={<AppShell />}>
           <Route path="/review" element={<Placeholder title="Review your order" />} />
           <Route path="/yard" element={<Placeholder title="Yard" note="Staff tools are coming in a later build." />} />
@@ -65,6 +72,7 @@ const AuthenticatedApp = () => {
           <Route element={<CustomerGate />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/assistant" element={<AssistantPage />} />
             <Route path="/card" element={<Placeholder title="Card on file" />} />
             <Route path="/orders/:id" element={<Placeholder title="Order detail" />} />
             <Route path="/profile" element={<Profile />} />

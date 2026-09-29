@@ -11,6 +11,7 @@ export function tabForPath(pathname) {
   if (pathname.startsWith("/orders")) return "/orders";
   if (pathname === "/profile" || pathname.startsWith("/card")) return "/profile";
   if (pathname === "/seo") return "/seo";
+  if (pathname === "/assistant") return "/";
   return null;
 }
 

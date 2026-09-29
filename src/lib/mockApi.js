@@ -72,6 +72,43 @@ const productsFor = (location) =>
 const ok = (data) => ({ status: 200, data });
 const fail = (status, error) => ({ status, data: { error } });
 
+const OPTIN_KEY = "scr_mock_optin";
+const MEMBER_TOKEN = "mb_scr_demo";
+
+function recordOptIn(body) {
+  let digits = String(body.phone || "").replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
+  if (digits.length !== 10) return fail(400, "Enter a valid 10-digit phone number.");
+  if (!body.smsConsent) return fail(400, "Text-message consent is required to continue.");
+  if (body.email && !/^\S+@\S+\.\S+$/.test(body.email)) return fail(400, "Enter a valid email address.");
+  localStorage.setItem(OPTIN_KEY, JSON.stringify({
+    phone: digits, email: body.email || "", smsConsent: true, emailConsent: !!body.emailConsent,
+    source: body.source || "qr", at: new Date().toISOString(),
+  }));
+  return ok({ ok: true });
+}
+
+function memberByQr(token) {
+  if (!token || token.length < 4) return fail(404, "This QR code isn't recognized.");
+  const past = orders.find((o) => ["Done", "Cancelled"].includes(o.status)) || orders[0];
+  const products = productsFor(past.location);
+  const lines = (past.lines || []).map((l) => {
+    const p = products.find((x) => x.sku === l.sku);
+    return { sku: l.sku, name: p?.name || l.name, size: p?.size || "", price: p?.price ?? 0, qty: l.qty };
+  });
+  const lastOrder = { ...past, lines };
+  return ok({
+    member: {
+      id: "cus_mock_001",
+      firstName: getProfile().firstName || "SCR",
+      lastName: getProfile().lastName || "Demo",
+      store: getProfile().preferredStore || "LaBelle",
+    },
+    lastOrder,
+    reorder: { location: lastOrder.location, lines },
+  });
+}
+
 function issueTokens() {
   session.access = `mock-access-${Date.now()}`;
   return { accessToken: session.access, refreshToken: `mock-refresh-${Date.now()}` };
@@ -145,10 +182,14 @@ export async function mockTransport(method, fullPath, body = {}, headers = {}) {
   const [path, qs] = fullPath.split("?");
   const query = new URLSearchParams(qs);
   if (path.startsWith("/auth/")) return handleAuth(path, body || {});
+  if (`${method} ${path}` === "POST /optin") return recordOptIn(body || {});
+  const qrMatch = path.match(/^\/members\/qr\/(.+)$/);
+  if (method === "GET" && qrMatch) return memberByQr(decodeURIComponent(qrMatch[1]));
   if (!session.access || headers.Authorization !== `Bearer ${session.access}`) return fail(401, "Unauthorized");
 
   const route = `${method} ${path}`;
   if (route === "GET /me") return ok({ customer: customer(), needsName: needsName() });
+  if (route === "GET /me/qr") return ok({ token: MEMBER_TOKEN });
   if (route === "PATCH /me") {
     const { firstName, lastName, email, preferredStore } = body;
     if (!firstName || !lastName) return fail(400, "First and last name are required.");

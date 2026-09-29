@@ -11,3 +11,10 @@ export function captureDeepLink() {
 
 export const readPendingAdd = () => JSON.parse(sessionStorage.getItem(KEY) || "null");
 export const clearPendingAdd = () => sessionStorage.removeItem(KEY);
+
+const REORDER_KEY = "scr_pending_reorder";
+
+// Set when a member scans their barn QR; the dashboard applies it after sign-in.
+export const setPendingReorder = (r) => sessionStorage.setItem(REORDER_KEY, JSON.stringify(r));
+export const readPendingReorder = () => JSON.parse(sessionStorage.getItem(REORDER_KEY) || "null");
+export const clearPendingReorder = () => sessionStorage.removeItem(REORDER_KEY);

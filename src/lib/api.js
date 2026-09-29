@@ -105,4 +105,7 @@ export const api = {
   getDashboard: (location) => request("GET", `/dashboard?location=${encodeURIComponent(location)}`),
   placeHold: (order) => request("POST", "/orders", { body: order }),
   deleteAccount: () => request("DELETE", "/me"),
+  optIn: (data) => request("POST", "/optin", { body: data, auth: false }),
+  getMemberByQr: (token) => request("GET", `/members/qr/${encodeURIComponent(token)}`, { auth: false }),
+  getMyQr: () => request("GET", "/me/qr"),
 };

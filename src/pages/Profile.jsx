@@ -4,6 +4,7 @@ import { api, STORES } from "@/lib/api";
 import { useSession } from "@/lib/SessionContext";
 import StoreSwitcher from "@/components/dashboard/StoreSwitcher";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
+import BarnQrCard from "@/components/profile/BarnQrCard";
 
 const FIELDS = [
   ["firstName", "First name", "given-name", "text"],
@@ -85,6 +86,8 @@ export default function Profile() {
           Save changes
         </button>
       </form>
+
+      <BarnQrCard />
 
       <section aria-label="Danger zone" className="rounded-2xl border-2 border-destructive/30 bg-card p-5">
         <h2 className="font-heading text-3xl tracking-wide text-destructive">Danger zone</h2>
