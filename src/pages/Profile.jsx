@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { api, STORES } from "@/lib/api";
 import { useSession } from "@/lib/SessionContext";
+import { useAuth } from "@/lib/AuthContext";
 import StoreSwitcher from "@/components/dashboard/StoreSwitcher";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import BarnQrCard from "@/components/profile/BarnQrCard";
@@ -15,6 +16,7 @@ const FIELDS = [
 
 export default function Profile() {
   const { customer, applyMe, signOut } = useSession();
+  const { logout } = useAuth();
   const [form, setForm] = useState({
     firstName: customer?.firstName || "",
     lastName: customer?.lastName || "",
@@ -108,7 +110,10 @@ export default function Profile() {
       <DeleteAccountDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        onDeleted={() => signOut()}
+        onDeleted={() => {
+          signOut({ clearPlatformSession: false });
+          logout(false);
+        }}
       />
     </div>
   );

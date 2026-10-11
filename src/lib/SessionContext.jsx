@@ -61,7 +61,7 @@ export function SessionProvider({ children }) {
       setStatus("error");
     }
   };
-  const signOut = () => {
+  const signOut = ({ clearPlatformSession = true } = {}) => {
     queryClientInstance.clear();
     for (const key of [
       "scr_carts",
@@ -78,7 +78,7 @@ export function SessionProvider({ children }) {
       localStorage.removeItem(key);
     setCustomer(null);
     setStatus("signedOut");
-    logout();
+    if (clearPlatformSession) logout();
   };
   return (
     <SessionContext.Provider
