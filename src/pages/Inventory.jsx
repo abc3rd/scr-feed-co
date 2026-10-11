@@ -5,6 +5,7 @@ import { api, STORES } from "@/lib/api";
 import StoreSwitcher from "@/components/dashboard/StoreSwitcher";
 import { formatMoney } from "@/lib/format";
 import InboundManager from "@/components/dashboard/InboundManager";
+import StockScanner from "@/components/dashboard/StockScanner";
 
 const empty = {
   sku: "",
@@ -132,6 +133,13 @@ export default function Inventory() {
         <p role="status" className="text-primary">
           Product and stock saved.
         </p>
+      )}
+      {!loadError && !isLoading && (
+        <StockScanner
+          key={`scanner:${location}`}
+          location={location}
+          products={data?.products || []}
+        />
       )}
       <form
         onSubmit={submit}

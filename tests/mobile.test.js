@@ -5,6 +5,7 @@ import { mkdir } from "node:fs/promises";
 import { chromium } from "@playwright/test";
 import { testDatabase } from "./database.js";
 import { dispatch } from "../base44/functions/store-api/service.js";
+import QRCode from "qrcode";
 
 // Only auth is intercepted. Store requests execute the production service
 // against a real PostgreSQL WASM engine, with fixtures confined to this test.
@@ -215,6 +216,107 @@ test(
     ).products[0];
     assert.equal(inventory.onHand, 7);
     assert.equal(inventory.reserved, 0);
+    await staff.goto("http://127.0.0.1:5197/inventory");
+    await staff
+      .getByRole("heading", { name: "Scan stock in / out", exact: true })
+      .waitFor();
+    const scanCode = "001234567890";
+    await staff.getByLabel("Barcode or QR contents").fill(scanCode);
+    await staff
+      .getByRole("button", { name: "Find product", exact: true })
+      .click();
+    await staff.getByLabel("Match this label to").selectOption("TEST-FEED");
+    await staff
+      .getByRole("button", { name: "Save product match", exact: true })
+      .click();
+    await staff
+      .getByText("Physical: 7 · Reserved: 0 · Available: 7", { exact: true })
+      .waitFor();
+    await staff.getByLabel("Quantity", { exact: true }).fill("3");
+    await staff
+      .getByRole("button", { name: "Confirm stock in", exact: true })
+      .click();
+    await staff
+      .getByRole("status")
+      .filter({ hasText: "Stock movement saved" })
+      .waitFor();
+    // Feed a generated label through a camera stream; this exercises the actual
+    // decoder without requiring real hardware or granting a production session.
+    const qrImage = await QRCode.toDataURL(scanCode, { width: 480, margin: 4 });
+    await staff.evaluate(async (dataUrl) => {
+      const image = new Image();
+      image.src = dataUrl;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = 640;
+      canvas.height = 640;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, 640, 640);
+      ctx.drawImage(image, 80, 80, 480, 480);
+      Object.defineProperty(navigator.mediaDevices, "getUserMedia", {
+        configurable: true,
+        value: async () => {
+          const stream = canvas.captureStream(15);
+          const timer = setInterval(
+            () => ctx.drawImage(image, 80, 80, 480, 480),
+            60,
+          );
+          const track = stream.getVideoTracks()[0],
+            stop = track.stop.bind(track);
+          track.stop = () => {
+            clearInterval(timer);
+            stop();
+          };
+          return stream;
+        },
+      });
+    }, qrImage);
+    assert.equal(
+      await staff
+        .getByRole("button", { name: "Scan with camera", exact: true })
+        .count(),
+      1,
+    );
+    await staff
+      .getByRole("button", { name: "Scan with camera", exact: true })
+      .click();
+    await staff
+      .getByRole("region", { name: "Scan inventory" })
+      .getByText("Physical: 10 · Reserved: 0 · Available: 10", { exact: true })
+      .waitFor();
+    await staff.getByLabel("Movement").selectOption("out");
+    await staff.getByLabel("Quantity", { exact: true }).fill("2");
+    await staff
+      .getByRole("button", { name: "Confirm stock out", exact: true })
+      .click();
+    await staff
+      .getByRole("status")
+      .filter({ hasText: "Stock movement saved" })
+      .waitFor();
+    assert.equal(
+      (await call(admin, { action: "inventory", location: "LaBelle" }))
+        .products[0].onHand,
+      8,
+    );
+    assert.equal(
+      (await call(admin, { action: "stock-moves", location: "LaBelle" }))
+        .movements.length,
+      2,
+    );
+    const scanned = await call(admin, {
+      action: "lookup-code",
+      code: scanCode,
+      location: "LaBelle",
+    });
+    assert.equal(scanned.product.sku, "TEST-FEED");
+    assert.equal(
+      await staff.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      true,
+      "scanner mobile overflow",
+    );
     assert.equal(
       (await call(buyer, { action: "order", orderId: second })).order
         .finalAmount,
@@ -281,5 +383,17 @@ test(
       }
     }
     assert.deepEqual(errors, []);
+    await page.goto("http://127.0.0.1:5197/terms.html#sms");
+    await page
+      .getByRole("heading", { name: "SMS and email preferences", exact: true })
+      .waitFor();
+    assert.equal(new URL(page.url()).hash, "#sms");
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      true,
+      "terms mobile overflow",
+    );
   },
 );

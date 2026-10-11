@@ -44,4 +44,9 @@ export const api = {
   getAudit: () => request("audit"),
   saveInbound: (shipment) => request("save-inbound", shipment),
   arriveInbound: (id) => request("arrive-inbound", { id }),
+  lookupCode: (code, location) => request("lookup-code", { code, location }),
+  linkCode: (code, sku, location) => request("link-code", { code, sku, location }),
+  unlinkCode: (code, sku, location) => request("unlink-code", { code, sku, location }),
+  moveStock: (movement) => request("move-stock", movement),
+  getStockMoves: (location) => request("stock-moves", { location }),
 };

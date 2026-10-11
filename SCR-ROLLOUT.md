@@ -42,6 +42,45 @@ collect payment through the store register → record that total → complete ha
 
 ## Inventory and payment behavior
 
+### Existing product labels and staff scanning
+
+Staff can use **Scan stock in / out** on `/inventory` with the phone camera,
+a keyboard-style barcode reader, or manual code entry. UPC/EAN barcodes and
+supported QR/1D labels are decoded locally using ZXing. Camera access requires
+HTTPS and permission; native wrappers must provide their own camera permission
+configuration. Camera behavior must still be tested on actual store devices.
+
+Match an unfamiliar label to the exact existing SKU/package once. Leading zeros
+are preserved, QR contents are treated as identifiers, and scanned URLs are never
+opened. Multiple label codes may identify one SKU; one code cannot identify two
+different products. Shared manufacturer/marketing QR codes are unsuitable for
+item matching and should not be assigned to different packages. Stock must
+already exist for the selected location before a movement can be recorded.
+
+Existing installations should run **Set up scanning tables** or initialize the
+store again after syncing the new backend. Initialization is idempotent and
+creates missing tables without clearing existing records. Begin with real catalog
+exports and a physical count; this build does not import Lightspeed automatically.
+
+Each confirmed stock-in/out records quantity, location, reason, staff identity,
+time, and a request ID. An interrupted response is retried with the same saved ID
+to avoid duplicate adjustments. Stock cannot fall below active reservations;
+stale quantities require another scan. Recent movement history shows the latest
+50 records per location. Do not scan app orders out again: their existing Done
+action already deducts inventory. A counter-sale scan updates inventory only;
+it does not collect payment or create a QuickBooks receipt.
+
+SCR inventory is the operating ledger in this build. QuickBooks Online, Shopify,
+GoHighLevel contact sync, and accounting posting still require authenticated
+connectors and verified field mappings; none is activated by scanning. Confirm
+the QuickBooks edition and the actual counter-sale workflow before implementing
+accounting exports. Product labels identify a product, not a unique physical bag.
+
+The Terms and SMS Terms links now use the app's own `/terms.html` page and `#sms`
+section, avoiding the former unavailable Vercel terms URL. SCR must review the
+operational terms before customer launch. Other external legal pages and the
+external cookie script are unchanged and still need separate verification.
+
 - Server validation rejects invalid/duplicate quantities, missing or hidden
   products, stale prices, and insufficient available stock. Prices come from the
   database and must match the customer's reviewed price; cart totals are not

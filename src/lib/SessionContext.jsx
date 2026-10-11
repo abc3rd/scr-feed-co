@@ -70,6 +70,8 @@ export function SessionProvider({ children }) {
       "scr_pending_reorder",
     ])
       sessionStorage.removeItem(key);
+    for (const key of Object.keys(sessionStorage))
+      if (key.startsWith("scr_stock_move:")) sessionStorage.removeItem(key);
     for (const key of [
       "scr_refresh_token",
       "scr_mock_profile",

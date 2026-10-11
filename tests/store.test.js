@@ -443,3 +443,153 @@ test("catalog conflicts, favorites, contact preferences, and real inbound shipme
     0,
   );
 });
+
+test("existing label matches preserve zeros, enforce staff access, and reject ambiguous mappings", async (t) => {
+  const call = await setup(t);
+  const code = "001234567890";
+  await assert.rejects(
+    call(buyer, { action: "lookup-code", code, location: "LaBelle" }),
+    /Staff access/,
+  );
+  assert.equal(
+    (await call(admin, { action: "lookup-code", code, location: "LaBelle" }))
+      .product,
+    null,
+  );
+  await call(admin, {
+    action: "link-code",
+    code,
+    sku: "TEST-FEED",
+    location: "LaBelle",
+  });
+  const found = await call(admin, {
+    action: "lookup-code",
+    code,
+    location: "LaBelle",
+  });
+  assert.equal(found.code, code);
+  assert.equal(found.product.sku, "TEST-FEED");
+  assert.equal(
+    (
+      await call(admin, {
+        action: "lookup-code",
+        code: "1234567890",
+        location: "LaBelle",
+      })
+    ).product,
+    null,
+  );
+  await call(admin, { ...product, sku: "OTHER-PACK", name: "Other package" });
+  await assert.rejects(
+    call(admin, {
+      action: "link-code",
+      code,
+      sku: "OTHER-PACK",
+      location: "LaBelle",
+    }),
+    /another product/,
+  );
+  const qr = "https://manufacturer.example.test/product?id=feed";
+  await call(admin, {
+    action: "link-code",
+    code: qr,
+    sku: "TEST-FEED",
+    location: "LaBelle",
+  });
+  assert.equal(
+    (
+      await call(admin, {
+        action: "lookup-code",
+        code: qr,
+        location: "LaBelle",
+      })
+    ).product.sku,
+    "TEST-FEED",
+  );
+  await call(admin, {
+    action: "unlink-code",
+    code,
+    sku: "TEST-FEED",
+    location: "LaBelle",
+  });
+  assert.equal(
+    (await call(admin, { action: "lookup-code", code, location: "LaBelle" }))
+      .product,
+    null,
+  );
+});
+
+test("stock scans apply once, persist history, protect reservations, and reject stale counts", async (t) => {
+  const call = await setup(t),
+    code = "TEST-CODE";
+  await call(admin, {
+    action: "link-code",
+    code,
+    sku: "TEST-FEED",
+    location: "LaBelle",
+  });
+  const move = {
+    action: "move-stock",
+    requestId: crypto.randomUUID(),
+    code,
+    sku: "TEST-FEED",
+    location: "LaBelle",
+    qty: 5,
+    direction: "in",
+    reason: "received",
+    expectedVersion: 1,
+  };
+  await call(admin, move);
+  assert.equal((await call(admin, move)).replayed, true);
+  await assert.rejects(
+    call(admin, { ...move, qty: 6 }),
+    /different stock movement/,
+  );
+  await assert.rejects(call(buyer, move), /Staff access/);
+  const stock = async () =>
+    (await call(admin, { action: "inventory", location: "LaBelle" }))
+      .products[0];
+  assert.equal((await stock()).onHand, 13);
+  await assert.rejects(
+    call(admin, { ...move, requestId: crypto.randomUUID() }),
+    /Stock changed/,
+  );
+  await call(buyer, request(4));
+  await assert.rejects(
+    call(admin, {
+      ...move,
+      requestId: crypto.randomUUID(),
+      qty: 10,
+      direction: "out",
+      reason: "counter_sale",
+      expectedVersion: (await stock()).version,
+    }),
+    /reserved stock/,
+  );
+  await call(admin, {
+    ...move,
+    requestId: crypto.randomUUID(),
+    qty: 2,
+    direction: "out",
+    reason: "counter_sale",
+    expectedVersion: (await stock()).version,
+  });
+  assert.equal((await stock()).onHand, 11);
+  assert.equal((await stock()).reserved, 4);
+  const history = (
+    await call(admin, { action: "stock-moves", location: "LaBelle" })
+  ).movements;
+  assert.deepEqual(
+    history.map((m) => m.delta).sort((a, b) => a - b),
+    [-2, 5],
+  );
+  assert.equal(
+    history.every((m) => m.actor_id === admin.id),
+    true,
+  );
+  assert.equal(
+    (await call(admin, { action: "stock-moves", location: "Fort Myers" }))
+      .movements.length,
+    0,
+  );
+});

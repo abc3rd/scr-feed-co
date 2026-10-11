@@ -88,4 +88,20 @@ CREATE TABLE IF NOT EXISTS scr_inbound (
   arrived boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS scr_product_codes (
+  code text PRIMARY KEY,
+  sku text NOT NULL REFERENCES scr_products(sku),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS scr_stock_moves (
+  request_id text PRIMARY KEY,
+  actor_id text NOT NULL,
+  code text NOT NULL,
+  sku text NOT NULL REFERENCES scr_products(sku),
+  location text NOT NULL,
+  delta integer NOT NULL CHECK (delta <> 0),
+  reason text NOT NULL,
+  note text NOT NULL DEFAULT '',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 `;

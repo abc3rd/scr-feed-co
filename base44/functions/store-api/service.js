@@ -1,3 +1,4 @@
+import { scanning, SCAN_ACTIONS } from "./scanning.js";
 import { SCHEMA } from "./schema.js";
 import {
   StoreError,
@@ -191,6 +192,7 @@ export async function dispatch(sql, user, body) {
   if (!body || typeof body !== "object" || Array.isArray(body))
     throw new StoreError("Invalid request.");
   const action = body.action;
+  if (SCAN_ACTIONS.includes(action)) return scanning(sql, user, body);
   if (
     [
       "initialize",
