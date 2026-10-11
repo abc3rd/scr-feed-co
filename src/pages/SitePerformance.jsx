@@ -186,7 +186,7 @@ export default function SitePerformance() {
                         <stop offset="100%" stopColor="hsl(131 39% 30%)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(40 25% 82%)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="date" tick={{ fontSize: 11 }} tickFormatter={(d) => d.slice(5)} />
                     <YAxis tick={{ fontSize: 11 }} />
                     <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(40 25% 82%)" }} />

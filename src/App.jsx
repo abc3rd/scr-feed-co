@@ -36,7 +36,7 @@ const AuthenticatedApp = () => {
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-border border-t-foreground rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -67,7 +67,7 @@ const AuthenticatedApp = () => {
           <Route path="/review" element={<Placeholder title="Review your order" />} />
           <Route path="/yard" element={<Placeholder title="Yard" note="Staff tools are coming in a later build." />} />
           <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-            <Route path="/seo" element={<Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" /></div>}><SitePerformance /></Suspense>} />
+            <Route path="/seo" element={<Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-border border-t-foreground rounded-full animate-spin" /></div>}><SitePerformance /></Suspense>} />
           </Route>
           <Route element={<CustomerGate />}>
             <Route path="/" element={<Dashboard />} />
