@@ -1,5 +1,16 @@
 # Base44 Project
 
+## SCR order-ahead rollout
+
+The storefront uses Base44 authentication and the `store-api` backend function.
+Customer profiles, the catalog, stock reservations, orders, contact preferences,
+and audit events are persisted in PostgreSQL. No demo catalog or customer bypass
+ships with this build. See [SCR-ROLLOUT.md](SCR-ROLLOUT.md) for setup and verification.
+
+This first release accepts orders with payment at the store/hand-off. It does not
+collect card details, authorize Stripe holds, or charge a card. Staff record the
+total collected through their register when they complete an order.
+
 Use this repository to run and edit the app locally, then publish changes back through Base44.
 
 Any change pushed to the repo will also be reflected in the Base44 Builder.

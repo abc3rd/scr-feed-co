@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LayoutDashboard, ClipboardList, User, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ClipboardList, User, Warehouse } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { tabForPath, getTabLocation, setTabLocation, resetTab } from "@/lib/tabStack";
 
@@ -10,13 +10,14 @@ const CUSTOMER_TABS = [
   { to: "/orders", label: "Orders", icon: ClipboardList },
   { to: "/profile", label: "Profile", icon: User },
 ];
-const ADMIN_TAB = { to: "/seo", label: "Performance", icon: BarChart3 };
+const ADMIN_TAB = { to: "/yard", label: "Yard", icon: Warehouse };
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
-  const tabs = isAuthenticated ? [...CUSTOMER_TABS, ADMIN_TAB] : CUSTOMER_TABS;
+  const { user } = useAuth();
+  const isStaff = user?.role === "admin";
+  const tabs = isStaff ? [...CUSTOMER_TABS, ADMIN_TAB] : CUSTOMER_TABS;
   const activeTab = tabForPath(location.pathname);
   const lastTap = useRef(0);
 
@@ -44,7 +45,7 @@ export default function BottomNav() {
       aria-label="Primary"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 backdrop-blur safe-area-bottom select-none"
     >
-      <div className={`max-w-xl mx-auto grid ${isAuthenticated ? "grid-cols-4" : "grid-cols-3"}`}>
+      <div className={`max-w-xl mx-auto grid ${isStaff ? "grid-cols-4" : "grid-cols-3"}`}>
         {tabs.map(({ to, label, icon: Icon }) => {
           const isActive = activeTab === to;
           return (

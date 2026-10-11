@@ -2,22 +2,25 @@ import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { api, STORES } from "@/lib/api";
 import { useSession } from "@/lib/SessionContext";
+import { useAuth } from "@/lib/AuthContext";
 import StoreSwitcher from "@/components/dashboard/StoreSwitcher";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import BarnQrCard from "@/components/profile/BarnQrCard";
+import ContactPreferences from "@/components/profile/ContactPreferences";
 
 const FIELDS = [
   ["firstName", "First name", "given-name", "text"],
   ["lastName", "Last name", "family-name", "text"],
-  ["email", "Email", "email", "email"],
+  ["phone", "Phone for order questions", "tel", "tel"],
 ];
 
 export default function Profile() {
   const { customer, applyMe, signOut } = useSession();
+  const { logout } = useAuth();
   const [form, setForm] = useState({
     firstName: customer?.firstName || "",
     lastName: customer?.lastName || "",
-    email: customer?.email || "",
+    email: customer?.email || "", phone: customer?.phone || "",
     preferredStore: customer?.preferredStore || STORES[0],
   });
   const [busy, setBusy] = useState(false);
@@ -87,12 +90,13 @@ export default function Profile() {
         </button>
       </form>
 
+      <ContactPreferences />
       <BarnQrCard />
 
       <section aria-label="Danger zone" className="rounded-2xl border-2 border-destructive/30 bg-card p-5">
         <h2 className="font-heading text-3xl tracking-wide text-destructive">Danger zone</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Deleting your account removes your profile, saved details, and order history. This can't be undone.
+          Deleting your account removes your personal store profile and sign-in account. Anonymous completed order records remain for store accounting. Cancel or complete active orders first.
         </p>
         <button
           type="button"
@@ -106,7 +110,10 @@ export default function Profile() {
       <DeleteAccountDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        onDeleted={() => signOut()}
+        onDeleted={() => {
+          signOut({ clearPlatformSession: false });
+          logout(false);
+        }}
       />
     </div>
   );

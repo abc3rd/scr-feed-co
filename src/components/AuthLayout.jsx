@@ -1,7 +1,7 @@
 import React from "react";
 import BackHeader from "@/components/layout/BackHeader";
 
-export default function AuthLayout({ icon: Icon, title, subtitle, footer, children, backTitle, backTo }) {
+export default function AuthLayout({ icon: Icon, title, subtitle = undefined, footer = undefined, children = undefined, backTitle = undefined, backTo = undefined }) {
   const body = (
     <div className="w-full max-w-md">
       <div className="text-center mb-10">

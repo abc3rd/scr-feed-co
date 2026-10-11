@@ -7,14 +7,14 @@ import StoreSwitcher from "@/components/dashboard/StoreSwitcher";
 const FIELDS = [
   ["firstName", "First name", "given-name", "text"],
   ["lastName", "Last name", "family-name", "text"],
-  ["email", "Email", "email", "email"],
+  ["phone", "Phone for order questions", "tel", "tel"],
 ];
 
 export default function ProfileStep() {
   const { customer, applyMe } = useSession();
   const [form, setForm] = useState({
     firstName: customer?.firstName || "", lastName: customer?.lastName || "",
-    email: customer?.email || "", preferredStore: customer?.preferredStore || "",
+    email: customer?.email || "", phone: customer?.phone || "", preferredStore: customer?.preferredStore || "",
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -36,7 +36,7 @@ export default function ProfileStep() {
     <form onSubmit={submit} className="pt-4 space-y-5">
       <div>
         <h1 className="font-heading text-5xl leading-none">Welcome in</h1>
-        <p className="text-muted-foreground mt-2">A few details so the yard knows whose order is whose.</p>
+        <p className="text-muted-foreground mt-2">A few details so the yard knows whose order is whose. Your sign-in email is used for your account.</p>
       </div>
       {FIELDS.map(([key, label, auto, type]) => (
         <div key={key}>
