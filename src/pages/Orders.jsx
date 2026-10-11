@@ -1,39 +1,49 @@
 import React from "react";
-import { useQueries } from "@tanstack/react-query";
-import { api, STORES } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import OrdersSection from "@/components/dashboard/OrdersSection";
-
 export default function Orders() {
-  const results = useQueries({
-    queries: STORES.map((loc) => ({
-      queryKey: ["dashboard", loc],
-      queryFn: () => api.getDashboard(loc),
-    })),
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["orders"],
+    queryFn: () => api.getOrders(),
+    refetchInterval: 15000,
   });
-  const isLoading = results.some((r) => r.isLoading);
-  const error = results.find((r) => r.error)?.error;
-  const activeOrders = results.flatMap((r) => r.data?.activeOrders || []);
-  const pastOrders = results.flatMap((r) => r.data?.pastOrders || []);
-
+  const active = (data?.orders || []).filter(
+    (o) => !["Done", "Cancelled"].includes(o.status),
+  );
+  const past = (data?.orders || []).filter((o) =>
+    ["Done", "Cancelled"].includes(o.status),
+  );
   return (
-    <div className="pt-4 space-y-8">
+    <div className="space-y-8">
       <div>
-        <h1 className="font-heading text-5xl leading-none">Orders</h1>
-        <p className="text-muted-foreground mt-2">All your active and past orders across stores.</p>
+        <h1 className="font-heading text-5xl">Orders</h1>
+        <p className="text-muted-foreground">
+          Active and past orders across stores.
+        </p>
       </div>
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
-        </div>
+        <p role="status">Loading orders…</p>
       ) : error ? (
-        <div role="alert" className="rounded-2xl bg-card border border-border p-5 text-center">
-          <p className="font-semibold text-destructive">{error.message}</p>
+        <div role="alert">
+          <p>{error.message}</p>
+          <button onClick={() => refetch()} className="mt-3 underline">
+            Try again
+          </button>
         </div>
       ) : (
-        <div className="space-y-9">
-          <OrdersSection title="Active orders" orders={activeOrders} emptyText="No active orders." />
-          <OrdersSection title="Past orders" orders={pastOrders} emptyText="No past orders yet." />
-        </div>
+        <>
+          <OrdersSection
+            title="Active orders"
+            orders={active}
+            emptyText="No active orders."
+          />
+          <OrdersSection
+            title="Past orders"
+            orders={past}
+            emptyText="No past orders yet."
+          />
+        </>
       )}
     </div>
   );

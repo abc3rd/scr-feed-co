@@ -11,7 +11,7 @@ const RANGES = [["7", "Last 7 days"], ["28", "Last 28 days"], ["90", "Last 90 da
 const pct = (n) => `${(n * 100).toFixed(1)}%`;
 const num = (n) => n.toLocaleString("en-US");
 
-function StatCard({ icon: Icon, label, value, hint }) {
+function StatCard({ icon: Icon, label, value, hint = undefined }) {
   return (
     <div className="rounded-2xl bg-card border border-border p-4">
       <div className="flex items-center gap-2 text-muted-foreground">

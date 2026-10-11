@@ -1,9 +1,18 @@
-import React from "react";
-import { Plus, Wheat } from "lucide-react";
+import React, { useState } from "react";
+import { Plus, Wheat, Star } from "lucide-react";
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 import StockBadge from "@/components/dashboard/StockBadge";
 import { formatMoney, stockStatus } from "@/lib/format";
 
 export default function ProductRow({ product, inCart = 0, onAdd }) {
+  const client = useQueryClient();
+  const [busy,setBusy] = useState(false),[error,setError] = useState('');
+  const favorite = async () => {
+    setBusy(true);setError('');
+    try { await api.favorite(product.sku,!product.isFavorite); await client.invalidateQueries({queryKey:['dashboard']}); }
+    catch(err) { setError(err.message); } finally { setBusy(false); }
+  };
   const out = stockStatus(product) === "out";
   const maxed = inCart >= product.available;
 
@@ -19,7 +28,9 @@ export default function ProductRow({ product, inCart = 0, onAdd }) {
           <span className="font-bold">{formatMoney(product.price)}</span>
           <StockBadge product={product} />
         </div>
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       </div>
+      <button type="button" disabled={busy} onClick={favorite} aria-label={`${product.isFavorite?'Remove':'Save'} ${product.name} ${product.isFavorite?'from':'to'} favorites`} aria-pressed={product.isFavorite} className="h-11 w-9 shrink-0 text-primary disabled:opacity-40"><Star className="h-5 w-5 mx-auto" fill={product.isFavorite?'currentColor':'none'}/></button>
       <button
         type="button"
         onClick={() => onAdd(product)}

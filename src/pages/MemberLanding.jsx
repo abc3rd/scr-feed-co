@@ -63,7 +63,7 @@ export default function MemberLanding() {
             {last ? (
               <div className="mt-6 rounded-2xl bg-card border border-border p-5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold">{last.id}</span>
+                  <span className="font-bold break-all">{last.id}</span>
                   <StatusChip status={last.status} />
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -78,7 +78,7 @@ export default function MemberLanding() {
                   ))}
                 </ul>
                 <p className="text-sm mt-2 font-semibold">
-                  {last.finalAmount != null ? `Charged ${formatMoney(last.finalAmount)}` : `Hold ${formatMoney(last.holdAmount)}`}
+                  {last.finalAmount != null ? `Recorded amount ${formatMoney(last.finalAmount)}` : `Estimated items ${formatMoney(last.subtotal)}`}
                 </p>
                 <button
                   type="button"
@@ -89,7 +89,7 @@ export default function MemberLanding() {
                   Reorder these items
                 </button>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  We'll load them into your cart — sign in if needed to place the hold.
+                  We'll load them into your cart — review stock and submit your order.
                 </p>
               </div>
             ) : (

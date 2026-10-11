@@ -13,8 +13,7 @@ export default function QrCodes() {
         <div className="rounded-2xl bg-card border border-border p-6 text-center">
           <h1 className="font-heading text-3xl tracking-wide">Register &amp; sign-up QR</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Print this and set it at the counter. Customers scan it to sign up, opt in to texts, and chat with the
-            assistant — all in one step.
+            Print this and set it at the counter. Customers scan it to create an account, choose their store, and start ordering.
           </p>
           <div className="mt-5 flex justify-center">
             <QrCode value={url} size={240} alt="Register sign-up QR code" />

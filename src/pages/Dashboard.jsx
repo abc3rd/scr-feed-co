@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { CreditCard, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { api, STORES } from "@/lib/api";
 import { indexProducts } from "@/lib/format";
 import { readPendingAdd, readPendingReorder, clearPendingReorder } from "@/lib/deepLink";
@@ -16,7 +16,6 @@ import TrucksSection from "@/components/dashboard/TrucksSection";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import CartBar from "@/components/cart/CartBar";
 import CartDrawer from "@/components/cart/CartDrawer";
-import HoldPlacedDialog from "@/components/cart/HoldPlacedDialog";
 import PullToRefresh from "@/components/dashboard/PullToRefresh";
 
 const linesForReorder = (order, index) =>
@@ -28,7 +27,7 @@ const linesForReorder = (order, index) =>
         name: p?.name || l.name,
         size: p?.size || "",
         price: p?.price ?? 0,
-        qty: Math.min(l.qty, p?.available ?? l.qty),
+        qty: Math.min(l.qty, p?.available ?? 0),
       };
     })
     .filter((l) => l.qty > 0);
@@ -42,24 +41,17 @@ export default function Dashboard() {
     return STORES.includes(loc) ? loc : customer.preferredStore || STORES[0];
   });
   const [cartOpen, setCartOpen] = useState(false);
-  const [placed, setPlaced] = useState(null);
   const cart = useCart(location);
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["dashboard", location],
     queryFn: () => api.getDashboard(location),
+    refetchInterval: 15000,
   });
 
   const productIndex = useMemo(() => indexProducts(data), [data]);
   const liveItems = cart.items.map((i) => ({ ...i, available: 0, ...productIndex[i.sku], qty: i.qty }));
   const cartQty = Object.fromEntries(cart.items.map((i) => [i.sku, i.qty]));
   usePendingAdd(data, productIndex, cart.add, () => setCartOpen(true));
-
-  const onPlaced = (order) => {
-    cart.clear();
-    setCartOpen(false);
-    setPlaced(order);
-    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-  };
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
@@ -72,9 +64,9 @@ export default function Dashboard() {
     const pending = readPendingReorder();
     if (!pending) return;
     qrReorderAppliedRef.current = true;
+    if (data.location !== location) { qrReorderAppliedRef.current = false; return; }
     clearPendingReorder();
-    if (data.location !== location) return;
-    const lines = (pending.lines || []).filter((l) => l.qty > 0);
+    const lines = linesForReorder(pending, productIndex);
     if (lines.length) {
       cart.setAll(lines);
       setCartOpen(true);
@@ -116,12 +108,6 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground">Howdy,</p>
           <h1 className="font-heading text-5xl leading-none truncate">{customer.firstName}</h1>
         </div>
-        {customer.card && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1 shrink-0 pb-1">
-            <CreditCard className="h-4 w-4" aria-hidden="true" />
-            {customer.card.brand} •• {customer.card.last4}
-          </p>
-        )}
       </div>
       <StoreSwitcher value={location} onChange={setLocation} />
 
@@ -146,6 +132,7 @@ export default function Dashboard() {
             {data.activeOrders.length > 0 && <OrdersSection title="Active orders" orders={data.activeOrders} />}
             <ProductSection title="Order again" products={data.orderAgain} cartQty={cartQty} onAdd={cart.add} emptyText="Your past orders will show up here." />
             <ProductSection title="Favorites" products={data.favorites} cartQty={cartQty} onAdd={cart.add} emptyText="No favorites yet." />
+            {!data.categories.length && <p className="rounded-2xl bg-card border border-border p-5 text-muted-foreground">The store has not published products at this location yet.</p>}
             <CategoryBrowser key={location} categories={data.categories} cartQty={cartQty} onAdd={cart.add} />
             <TrucksSection trucks={data.trucks} location={location} />
             <OrdersSection title="Past orders" orders={data.pastOrders} emptyText="No past orders yet." onReorder={reorder} />
@@ -154,8 +141,7 @@ export default function Dashboard() {
       </div>
 
       <CartBar count={cart.count} location={location} onOpen={() => setCartOpen(true)} />
-      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} items={liveItems} cart={cart} location={location} onPlaced={onPlaced} />
-      <HoldPlacedDialog order={placed} onClose={() => setPlaced(null)} />
+      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} items={liveItems} cart={cart} location={location} />
     </div>
     </PullToRefresh>
   );
