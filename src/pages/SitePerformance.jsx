@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { RefreshCw, Search, TrendingUp, MousePointerClick, Eye, Target, ChevronDown } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { searchConsolePerformance } from "@/functions/searchConsolePerformance";
-import BackHeader from "@/components/layout/BackHeader";
+import PullToRefresh from "@/components/dashboard/PullToRefresh";
 import OptionSheet from "@/components/site/OptionSheet";
-import SiteFooter from "@/components/layout/SiteFooter";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const RANGES = [["7", "Last 7 days"], ["28", "Last 28 days"], ["90", "Last 90 days"]];
@@ -104,11 +103,14 @@ export default function SitePerformance() {
   const rangeLabel = RANGES.find(([v]) => v === days)?.[1] || "Select range";
 
   return (
-    <div>
-      <BackHeader title="Search performance" />
-      <main className="w-full max-w-3xl mx-auto px-4 py-6 space-y-6">
-        <div className="flex items-end justify-between gap-3">
-          <p className="text-muted-foreground text-sm">Synced from Google Search Console.</p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="font-heading text-5xl">Search performance</h1>
+        <p className="text-muted-foreground">Synced from Google Search Console.</p>
+      </div>
+      <PullToRefresh onRefresh={() => load(siteUrl, days)}>
+      <div className="py-6 space-y-6">
+        <div className="flex items-end justify-end gap-3">
           <button
             type="button"
             onClick={() => load(siteUrl, days)}
@@ -214,9 +216,8 @@ export default function SitePerformance() {
             )}
           </>
         ) : null}
-      </main>
-
-      <SiteFooter />
+      </div>
+      </PullToRefresh>
     </div>
   );
 }

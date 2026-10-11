@@ -20,7 +20,7 @@ export default function AppShell() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-card focus:px-4 focus:py-3 focus:rounded-xl">
         Skip to content
       </a>
-      <SiteHeader />
+      {["/", "/orders", "/profile", "/seo"].includes(location.pathname) && <SiteHeader />}
       <main id="main" className="flex-1 w-full max-w-xl mx-auto px-4 pt-5 pb-28">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div

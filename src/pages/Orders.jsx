@@ -2,6 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import OrdersSection from "@/components/dashboard/OrdersSection";
+import PullToRefresh from "@/components/dashboard/PullToRefresh";
 export default function Orders() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["orders"],
@@ -22,29 +23,33 @@ export default function Orders() {
           Active and past orders across stores.
         </p>
       </div>
-      {isLoading ? (
-        <p role="status">Loading orders…</p>
-      ) : error ? (
-        <div role="alert">
-          <p>{error.message}</p>
-          <button onClick={() => refetch()} className="mt-3 underline">
-            Try again
-          </button>
+      <PullToRefresh onRefresh={() => refetch()}>
+        <div className="space-y-8">
+          {isLoading ? (
+            <p role="status">Loading orders…</p>
+          ) : error ? (
+            <div role="alert">
+              <p>{error.message}</p>
+              <button onClick={() => refetch()} className="mt-3 underline">
+                Try again
+              </button>
+            </div>
+          ) : (
+            <>
+              <OrdersSection
+                title="Active orders"
+                orders={active}
+                emptyText="No active orders."
+              />
+              <OrdersSection
+                title="Past orders"
+                orders={past}
+                emptyText="No past orders yet."
+              />
+            </>
+          )}
         </div>
-      ) : (
-        <>
-          <OrdersSection
-            title="Active orders"
-            orders={active}
-            emptyText="No active orders."
-          />
-          <OrdersSection
-            title="Past orders"
-            orders={past}
-            emptyText="No past orders yet."
-          />
-        </>
-      )}
+      </PullToRefresh>
     </div>
   );
 }
