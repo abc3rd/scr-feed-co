@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import StatusChip from "@/components/dashboard/StatusChip";
 import { formatDate, formatMoney } from "@/lib/format";
 
-export default function OrdersSection({ title, orders, emptyText, onReorder }) {
+export default function OrdersSection({ title, orders, emptyText, onReorder = undefined }) {
   return (
     <section aria-label={title}>
       <h2 className="font-heading text-3xl tracking-wide mb-3">{title}</h2>
@@ -22,9 +22,9 @@ export default function OrdersSection({ title, orders, emptyText, onReorder }) {
                     <p className="text-sm text-muted-foreground mt-1">
                       {o.location} · {o.fulfillment === "delivery" ? "Delivery" : "Pickup"} · {formatDate(o.date)}
                     </p>
-                    <p className="text-sm mt-1">
+                    {(Number.isFinite(o.finalAmount) || Number.isFinite(o.holdAmount)) && <p className="text-sm mt-1">
                       {o.finalAmount != null ? `Charged ${formatMoney(o.finalAmount)}` : `Hold ${formatMoney(o.holdAmount)}`}
-                    </p>
+                    </p>}
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" aria-hidden="true" />
                 </Link>

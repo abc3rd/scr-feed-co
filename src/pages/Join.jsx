@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import { Loader2, Sprout } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatPhone } from "@/lib/format";
@@ -13,7 +14,7 @@ export default function Join() {
   const [emailConsent, setEmailConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const valid = phone.length === 10 && smsConsent;
+  const valid = (smsConsent || emailConsent) && (!smsConsent || phone.length === 10) && (!emailConsent || /^\S+@\S+\.\S+$/.test(email.trim()));
 
   const submit = async (e) => {
     e.preventDefault();
@@ -54,7 +55,7 @@ export default function Join() {
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel-national"
-                  placeholder="(239) 555-0142"
+                  placeholder="Your mobile number"
                   value={formatPhone(phone)}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                   className="w-full h-14 rounded-2xl border-2 border-input bg-card px-4 text-xl tracking-wide focus:border-primary"
@@ -96,6 +97,7 @@ export default function Join() {
                 <span className="text-sm leading-relaxed">Email me occasional store news and reorder reminders.</span>
               </label>
               {error && <p role="alert" className="text-destructive font-medium">{error}</p>}
+      {error && <Link to="/login?returnTo=%2Fjoin" className="block text-primary underline">Sign in to save your preferences</Link>}
               <button
                 type="submit"
                 disabled={!valid || busy}

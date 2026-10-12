@@ -92,7 +92,7 @@ export default function Profile() {
       <section aria-label="Danger zone" className="rounded-2xl border-2 border-destructive/30 bg-card p-5">
         <h2 className="font-heading text-3xl tracking-wide text-destructive">Danger zone</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Deleting your account removes your profile, saved details, and order history. This can't be undone.
+          Deleting your account removes your profile and contact preferences. Completed store orders remain without a link to your account. This can't be undone.
         </p>
         <button
           type="button"

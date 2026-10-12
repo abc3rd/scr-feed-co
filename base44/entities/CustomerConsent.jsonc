@@ -1,0 +1,55 @@
+{
+  "name": "CustomerConsent",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "sms_consent": {
+      "type": "boolean"
+    },
+    "email_consent": {
+      "type": "boolean"
+    },
+    "source": {
+      "type": "string"
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "sms_consent",
+    "email_consent",
+    "recorded_at",
+    "version"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

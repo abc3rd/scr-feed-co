@@ -84,3 +84,44 @@ GitHub integration: [https://docs.base44.com/developers/app-code/local-developme
 Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
 
 Support: [https://app.base44.com/support](https://app.base44.com/support)
+
+## Production customer backend
+
+The frontend now uses verified Base44 login and `customerApi`; the mock API,
+demo sign-in, fixed SMS verification code, and placeholder screens have been
+removed. Publish the five new entity schemas and the `customerApi` function
+through Base44 along with the assistant fix. No products, stock counts, orders,
+truck arrivals, or saved cards are seeded.
+
+Import verified store data into `Product` before enabling catalog access.
+Each record is scoped by `location`, uses integer `price_cents` and `available`,
+and can include existing UPC/barcode values in `barcodes`. `Order` and
+`TruckArrival` contain actual store records only. Customer profiles and consent
+records are written through the authenticated function, not directly by clients.
+
+`customerApi` filters orders by verified user ID and checks ownership for order
+details and member QR links. Admin accounts may read the yard queue. A member
+QR selects the account's history only after the owner signs in; the QR itself
+never grants access. QR images are generated locally using `qrcode`, with M
+error correction, a four-module quiet zone, and whole-pixel module scaling with a minimum 240px image width.
+
+Account deletion checks for active orders, removes profile and consent data,
+anonymizes completed store orders, and deletes the Base44 user. Failure to
+remove the user does not produce a successful deletion response. Admin users
+must transfer administration first. This does not delete records held in
+external accounting or payment platforms. No automatic seven-year deletion
+schedule is implemented or claimed.
+
+Online checkout is deliberately disabled until the real store payment and
+inventory integration is implemented and verified. No card hold is simulated,
+and customer API calls cannot decrement stock. Shopify, QuickBooks, HighLevel,
+SMS delivery, financial fulfillment, and policy URLs still need configuration
+and live verification before a Google Play release. Consent preferences are
+stored in Base44; they are not yet synchronized to a messaging provider.
+
+Verification: `node --test tests/*.test.mjs`, `npm run lint`, and `npm run build`.
+The full-project `typecheck` currently has existing component typing errors;
+the assistant handler has a separate strict TypeScript check. Auth/database
+checks use injected dependencies and do not prove live Base44 publication.
+
+Independent QR verification generated 15 symbols with the production encoder; all decoded to their exact original payloads in both OpenCV and ZXing. This includes 12 realistic member-link digests, a counter link, a UCP JSON payload, and Unicode text. These are raster decoder checks, not physical device camera tests. Generate fixtures with `node tests/qr-encode.mjs <temporary-output-directory>` and decode with independent tools.

@@ -57,7 +57,7 @@ export default function MemberLanding() {
               Welcome back{data.member.firstName ? `, ${data.member.firstName}` : ""}.
             </h1>
             <p className="text-muted-foreground mt-2">
-              Scanned from the barn — here's your last order at {data.member.store}.
+              Scanned from the barn — here's your last order at {data.member.preferredStore}.
             </p>
 
             {last ? (

@@ -30,7 +30,7 @@ export default function BarnQrCard() {
     <section aria-label="Your barn QR" className="rounded-2xl border-2 border-border bg-card p-5">
       <h2 className="font-heading text-3xl tracking-wide">Your barn QR</h2>
       <p className="text-sm text-muted-foreground mt-1">
-        Print this and hang it in the barn. Scanning it brings up your last order and starts a reorder.
+        Print this and hang it in the barn. Sign in to your account after scanning to view your last order and start a reorder.
       </p>
       {error ? (
         <p role="alert" className="text-destructive font-medium mt-3">{error}</p>
@@ -41,7 +41,7 @@ export default function BarnQrCard() {
       ) : (
         <>
           <div className="mt-4 flex justify-center">
-            <QrCode value={url} size={220} alt="Your barn QR code" />
+            <QrCode value={url} size={240} alt="Your barn QR code" />
           </div>
           <p className="mt-3 text-xs text-muted-foreground break-all text-center">{url}</p>
           <div className="mt-4 flex gap-3">

@@ -1,0 +1,50 @@
+{
+  "name": "TruckArrival",
+  "type": "object",
+  "properties": {
+    "location": {
+      "type": "string",
+      "enum": [
+        "LaBelle",
+        "Fort Myers"
+      ]
+    },
+    "supplier": {
+      "type": "string"
+    },
+    "eta": {
+      "type": "string",
+      "format": "date"
+    },
+    "note": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "location",
+    "supplier",
+    "eta",
+    "is_active"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": true,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

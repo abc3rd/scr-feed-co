@@ -7,7 +7,7 @@ import FulfillmentPicker from "@/components/cart/FulfillmentPicker";
 import { api } from "@/lib/api";
 import { tomorrowISO } from "@/lib/format";
 
-export default function CartDrawer({ open, onOpenChange, items, cart, location, onPlaced }) {
+export default function CartDrawer({ open, onOpenChange, items, cart, location, onPlaced, checkoutEnabled = false }) {
   const navigate = useNavigate();
   const [fulfillment, setFulfillment] = useState("pickup");
   const [date, setDate] = useState("");
@@ -55,17 +55,17 @@ export default function CartDrawer({ open, onOpenChange, items, cart, location, 
             <FulfillmentPicker value={fulfillment} onChange={setFulfillment} date={date} onDate={setDate} />
           </div>
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-            We'll place a temporary hold on your card. You're only charged the verified amount at hand-off.
+            Online checkout is currently unavailable. Your cart is saved while the store connects its payment service.
           </p>
           {error && <p role="alert" className="mt-3 text-destructive font-medium">{error}</p>}
           <button
             type="button"
             onClick={placeHold}
-            disabled={!valid || busy}
+            disabled={!valid || busy || !checkoutEnabled}
             className="mt-4 w-full h-14 rounded-2xl bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center gap-2 disabled:opacity-40"
           >
             {busy && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
-            Place Hold
+            {checkoutEnabled ? 'Place Hold' : 'Checkout unavailable'}
           </button>
         </div>
       </SheetContent>

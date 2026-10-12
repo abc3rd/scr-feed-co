@@ -154,7 +154,7 @@ export default function Dashboard() {
       </div>
 
       <CartBar count={cart.count} location={location} onOpen={() => setCartOpen(true)} />
-      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} items={liveItems} cart={cart} location={location} onPlaced={onPlaced} />
+      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} items={liveItems} cart={cart} location={location} onPlaced={onPlaced} checkoutEnabled={data?.checkout?.enabled === true} />
       <HoldPlacedDialog order={placed} onClose={() => setPlaced(null)} />
     </div>
     </PullToRefresh>

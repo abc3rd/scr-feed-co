@@ -1,0 +1,63 @@
+{
+  "name": "CustomerProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "firstName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "lastName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "email": {
+      "type": "string",
+      "maxLength": 254
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 20
+    },
+    "preferredStore": {
+      "type": "string",
+      "enum": [
+        "LaBelle",
+        "Fort Myers"
+      ]
+    },
+    "favorite_skus": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "user_id",
+    "firstName",
+    "lastName",
+    "email",
+    "preferredStore"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

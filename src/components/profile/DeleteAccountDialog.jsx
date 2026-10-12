@@ -39,7 +39,7 @@ export default function DeleteAccountDialog({ open, onOpenChange, onDeleted }) {
             <AlertDialogTitle>Delete your account?</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            This permanently deletes your SCR Feed Co. profile, saved details, and order history. You'll be signed out immediately. This action can't be undone.
+            This permanently deletes your SCR Feed Co. account, profile, and contact preferences. Completed store orders remain without a link to your account. Active orders must be completed or cancelled first. This action can't be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && <p role="alert" className="text-destructive font-medium text-sm">{error}</p>}

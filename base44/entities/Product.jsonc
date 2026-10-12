@@ -1,0 +1,73 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "sku": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "size": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "enum": [
+        "LaBelle",
+        "Fort Myers"
+      ]
+    },
+    "price_cents": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "available": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "reorder_threshold": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "is_active": {
+      "type": "boolean"
+    },
+    "barcodes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "sku",
+    "name",
+    "category",
+    "location",
+    "price_cents",
+    "available",
+    "is_active"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": true,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
