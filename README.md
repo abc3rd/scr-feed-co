@@ -1,5 +1,29 @@
 # Base44 Project
 
+## Assistant security
+
+`assistantChat` requires a Base44 user verified by `auth.me()`. The public site
+and demo customer session do not grant access to paid AI. Anonymous calls return
+401. The assistant UI offers Google sign-in when authentication is required.
+
+Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in the Base44 backend
+secrets, never in `VITE_*` variables or source code. Use a persistent Upstash
+Redis database. One atomic Lua operation enforces 10 calls per 60-second window
+and 100 per 24-hour window per verified user, plus 500 per 24-hour window across
+all users. Windows start with the first accepted call. Limits are shared across
+function replicas and restarts. User IDs are hashed in the Redis keys.
+
+Missing configuration, Redis errors, or invalid limiter responses return 503
+without calling the LLM. Quota exhaustion returns 429 with `Retry-After`.
+Messages, total conversation size, and request bytes are bounded. AI failures
+consume quota and do not trigger automatic retries.
+
+Run the security checks with Node 24: `node --test tests/assistant-chat.test.mjs`.
+These checks use injected auth/Redis/LLM responses and make no paid AI requests.
+After publishing from Base44, verify anonymous calls return 401 and configured
+signed-in calls enforce quotas. Repository changes alone do not protect an
+already-published function; the backend must be published again.
+
 Use this repository to run and edit the app locally, then publish changes back through Base44.
 
 Any change pushed to the repo will also be reflected in the Base44 Builder.

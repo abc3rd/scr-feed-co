@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RefreshCw, Search, TrendingUp, MousePointerClick, Eye, Target, ChevronDown } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { searchConsolePerformance } from "@/functions/searchConsolePerformance";
+import { base44 } from "@/api/base44Client";
 import BackHeader from "@/components/layout/BackHeader";
 import OptionSheet from "@/components/site/OptionSheet";
 import SiteFooter from "@/components/layout/SiteFooter";
@@ -70,7 +70,7 @@ export default function SitePerformance() {
     setLoading(true);
     setError("");
     try {
-      const res = await searchConsolePerformance({ siteUrl: site, days: range });
+      const res = await base44.functions.invoke("searchConsolePerformance", { siteUrl: site, days: range });
       const d = res.data;
       setSites(d.sites || []);
       if (d.message) {
