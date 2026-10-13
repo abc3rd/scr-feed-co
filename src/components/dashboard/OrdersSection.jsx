@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import StatusChip from "@/components/dashboard/StatusChip";
 import { formatDate, formatMoney } from "@/lib/format";
 
-export default function OrdersSection({ title, orders, emptyText, onReorder = undefined }) {
+export default function OrdersSection({ title, orders, emptyText = "", onReorder = undefined }) {
   return (
     <section aria-label={title}>
       <h2 className="font-heading text-3xl tracking-wide mb-3">{title}</h2>

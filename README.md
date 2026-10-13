@@ -120,8 +120,23 @@ and live verification before a Google Play release. Consent preferences are
 stored in Base44; they are not yet synchronized to a messaging provider.
 
 Verification: `node --test tests/*.test.mjs`, `npm run lint`, and `npm run build`.
-The full-project `typecheck` currently has existing component typing errors;
-the assistant handler has a separate strict TypeScript check. Auth/database
+The full-project `typecheck` now passes; the assistant handler also has a
+separate strict TypeScript check. Auth/database
 checks use injected dependencies and do not prove live Base44 publication.
 
 Independent QR verification generated 15 symbols with the production encoder; all decoded to their exact original payloads in both OpenCV and ZXing. This includes 12 realistic member-link digests, a counter link, a UCP JSON payload, and Unicode text. These are raster decoder checks, not physical device camera tests. Generate fixtures with `node tests/qr-encode.mjs <temporary-output-directory>` and decode with independent tools.
+
+## Catalog review preparation
+
+Run `python3 scripts/prepare-catalog.py <source-csv> <review-json>` to prepare
+source identifiers for review. This preserves source SKU and barcode text,
+flags duplicates, negative quantities, invalid numbers, and mismatched source
+columns, and leaves verified store, price, and quantity fields empty. Prepared
+records are inactive and not directly importable into the live Product entity.
+No source catalog or generated review data is stored in this repository.
+
+Component props now retain their underlying React/Radix types. Type checking
+remains enabled; the fixes include optional layout props, OTP child props,
+Vite environment types, and a typed Headers object for consent requests.
+The quality workflow runs typecheck, lint, backend abuse tests, catalog
+preparation tests, and the frontend build on pushes and pull requests.

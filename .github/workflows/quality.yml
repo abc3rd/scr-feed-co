@@ -1,0 +1,26 @@
+name: SCR quality checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: node --test tests/*.test.mjs
+      - run: python3 tests/catalog-preparation.test.py
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_BASE44_APP_ID: 6ab89211e8531ae475bf69ca
+          VITE_BASE44_APP_BASE_URL: https://app.base44.com

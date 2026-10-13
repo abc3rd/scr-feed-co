@@ -4,21 +4,23 @@ import { Minus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const InputOTP = React.forwardRef(({ className, containerClassName, ...props }, ref) => (
+const InputOTP = React.forwardRef(/** @type {React.ForwardRefRenderFunction<HTMLInputElement, Extract<import('input-otp').OTPInputProps, { children: React.ReactNode }>>} */ (({ className, containerClassName, ...props }, ref) => (
   <OTPInput
     ref={ref}
     containerClassName={cn("flex items-center gap-2 has-[:disabled]:opacity-50", containerClassName)}
     className={cn("disabled:cursor-not-allowed", className)}
     {...props} />
-))
+)))
+
 InputOTP.displayName = "InputOTP"
 
-const InputOTPGroup = React.forwardRef(({ className, ...props }, ref) => (
+const InputOTPGroup = React.forwardRef(/** @type {React.ForwardRefRenderFunction<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>} */ (({ className, ...props }, ref) => (
   <div ref={ref} className={cn("flex items-center", className)} {...props} />
-))
+)))
+
 InputOTPGroup.displayName = "InputOTPGroup"
 
-const InputOTPSlot = React.forwardRef(({ index, className, ...props }, ref) => {
+const InputOTPSlot = React.forwardRef(/** @type {React.ForwardRefRenderFunction<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { index: number }>} */ (({ index, className, ...props }, ref) => {
   const inputOTPContext = React.useContext(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
 
@@ -40,14 +42,16 @@ const InputOTPSlot = React.forwardRef(({ index, className, ...props }, ref) => {
       )}
     </div>)
   );
-})
+}))
+
 InputOTPSlot.displayName = "InputOTPSlot"
 
-const InputOTPSeparator = React.forwardRef(({ ...props }, ref) => (
+const InputOTPSeparator = React.forwardRef(/** @type {React.ForwardRefRenderFunction<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>} */ (({ ...props }, ref) => (
   <div ref={ref} role="separator" {...props}>
     <Minus />
   </div>
-))
+)))
+
 InputOTPSeparator.displayName = "InputOTPSeparator"
 
 export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator }

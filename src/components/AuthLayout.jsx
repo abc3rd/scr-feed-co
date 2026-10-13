@@ -1,6 +1,11 @@
 import React from "react";
 import BackHeader from "@/components/layout/BackHeader";
 
+/**
+ * @param {{ icon: import('lucide-react').LucideIcon, title: string,
+ * subtitle?: string, footer?: React.ReactNode, children?: React.ReactNode,
+ * backTitle?: string, backTo?: string }} props
+ */
 export default function AuthLayout({ icon: Icon, title, subtitle, footer, children, backTitle, backTo }) {
   const body = (
     <div className="w-full max-w-md">

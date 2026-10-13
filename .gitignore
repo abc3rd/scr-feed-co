@@ -35,3 +35,7 @@ dist-ssr
 .env
 .vite
 base44/.app.jsonc
+
+# Python catalog preparation
+__pycache__/
+*.py[cod]
